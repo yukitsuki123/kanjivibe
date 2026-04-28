@@ -1,0 +1,36 @@
+# Kanjivibe: Liquid Glass Darknight Design Tokens & Animation States
+
+## Design Tokens
+
+### Colors
+- **Background (Midnight Blue):** `#050A18`
+- **Glass Card:** `rgba(255, 255, 255, 0.05)` with `backdrop-filter: blur(20px)`
+- **Glass Border:** `rgba(255, 255, 255, 0.15)` (simulating light hitting glass)
+- **Primary Accent (Electric Purple):** `#7C3AED`
+- **Secondary Accent (Cyan):** `#06B6D4`
+- **Text (High Emphasis):** `#F8FAFC`
+- **Text (Low Emphasis):** `#94A3B8`
+
+### Typography
+- **Font Family:** 'Space Grotesk' or similar modern sans-serif.
+- **Kanji Display:** Large, bold weight with slight outer glow for emphasis.
+
+### Layout
+- **Bento Grid:** Standard 16px gutter between modules.
+- **Roundness:** 24px (Large) for cards and blobs to maintain an organic feel.
+
+---
+
+## Animation States & Liquid Transitions
+
+### 1. Liquid Swipe (Flashcards)
+- **State:** Resting -> Dragging -> Released (Dismiss/Next)
+- **Transition:** As the user drags the card, the edges should slightly distort or "stretch" in the direction of the drag, mimicking a viscous fluid. On release, the card "snaps" or "splashes" out of view with a spring-based velocity.
+
+### 2. Morphing Blobs (Module Selection)
+- **State:** Idle (Floating) -> Hover/Selected (Morphing)
+- **Transition:** Categories are contained within SVG blobs. When selected, the blob uses a `pop` and `morph` animation to change its vertex positions smoothly, transitioning from one organic shape to another while changing the accent glow intensity.
+
+### 3. Glass Entrance
+- **State:** Hidden -> Visible
+- **Transition:** Components fade in with a slight vertical offset (Y: 20 -> 0) while the blur radius increases from 0 to 20px, creating a "condensing" effect on the screen.

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kanjivibe Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-low": "#161b2a",
+                      "surface-tint": "#d2bbff",
+                      "primary": "#d2bbff",
+                      "on-background": "#dde2f6",
+                      "surface-container": "#1a1f2e",
+                      "on-primary": "#3f008e",
+                      "inverse-primary": "#732ee4",
+                      "primary-fixed-dim": "#d2bbff",
+                      "on-tertiary-container": "#faddff",
+                      "on-secondary": "#00363a",
+                      "secondary-container": "#00eefc",
+                      "on-tertiary-fixed": "#320047",
+                      "on-secondary-container": "#00686f",
+                      "primary-fixed": "#eaddff",
+                      "error-container": "#93000a",
+                      "surface-container-lowest": "#080e1c",
+                      "primary-container": "#7c3aed",
+                      "surface-container-highest": "#2f3444",
+                      "on-error-container": "#ffdad6",
+                      "secondary": "#d3fbff",
+                      "on-secondary-fixed-variant": "#004f54",
+                      "on-tertiary-fixed-variant": "#74009f",
+                      "error": "#ffb4ab",
+                      "on-surface": "#dde2f6",
+                      "surface-dim": "#0d1321",
+                      "tertiary-fixed": "#f8d8ff",
+                      "outline-variant": "#4a4455",
+                      "tertiary": "#ecb2ff",
+                      "background": "#0d1321",
+                      "surface": "#0d1321",
+                      "surface-bright": "#333949",
+                      "on-error": "#690005",
+                      "secondary-fixed": "#7df4ff",
+                      "inverse-surface": "#dde2f6",
+                      "on-tertiary": "#520071",
+                      "on-primary-fixed-variant": "#5a00c6",
+                      "on-primary-fixed": "#25005a",
+                      "inverse-on-surface": "#2b3040",
+                      "tertiary-container": "#a600e0",
+                      "secondary-fixed-dim": "#00dbe9",
+                      "on-surface-variant": "#ccc3d8",
+                      "on-secondary-fixed": "#002022",
+                      "on-primary-container": "#ede0ff",
+                      "surface-container-high": "#242a39",
+                      "tertiary-fixed-dim": "#ecb2ff",
+                      "surface-variant": "#2f3444",
+                      "outline": "#958da1"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Space Grotesk"],
+                      "body": ["Manrope"],
+                      "label": ["Manrope"]
+              }
+            },
+          }
+        }
+      </script>
+<style>
+        body { background-color: #0d1321; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .neon-glow-purple { box-shadow: 0 0 20px rgba(210, 187, 255, 0.1); }
+        .neon-glow-cyan { box-shadow: 0 0 20px rgba(211, 251, 255, 0.1); }
+        .kanji-focus { font-size: 4rem; line-height: 1; }
+      </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body text-on-surface selection:bg-primary/30 min-h-screen pb-32">
+<!-- TopAppBar -->
+<nav class="fixed top-0 w-full z-50 bg-slate-950/40 backdrop-blur-xl border-b border-white/15 flex justify-between items-center px-6 py-4 shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
+<div class="flex items-center gap-4">
+<button class="text-purple-200 hover:bg-white/5 transition-colors p-2 rounded-lg active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+</button>
+<span class="font-space-grotesk font-bold text-purple-300 drop-shadow-[0_0_8px_rgba(210,187,255,0.4)] tracking-tighter text-2xl uppercase">Kanjivibe</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-slate-400 hover:bg-white/5 transition-colors p-2 rounded-lg active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</nav>
+<main class="pt-24 px-6 max-w-6xl mx-auto space-y-8">
+<!-- Progress Summary -->
+<section class="glass-card rounded-3xl p-8 relative overflow-hidden neon-glow-purple">
+<div class="absolute -top-24 -right-24 w-64 h-64 bg-primary/10 blur-[100px] rounded-full"></div>
+<div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+<div class="space-y-2">
+<span class="font-headline text-xs font-bold uppercase tracking-[0.2em] text-primary/70">Current Mastery</span>
+<h1 class="font-headline text-4xl font-bold tracking-tight text-on-background">Level 14 <span class="text-primary-fixed-dim">Explorer</span></h1>
+<p class="text-on-surface-variant font-medium">You've mastered 128 Kanji this month. Keep the momentum!</p>
+</div>
+<div class="w-full md:w-64 space-y-3">
+<div class="flex justify-between text-sm font-bold font-label">
+<span class="text-on-surface-variant">MONTHLY GOAL</span>
+<span class="text-primary">85%</span>
+</div>
+<div class="h-3 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary to-tertiary w-[85%] rounded-full shadow-[0_0_12px_rgba(210,187,255,0.5)]"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Module Grid (Bento Layout) -->
+<div class="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-6 h-full">
+<!-- Food Card - Large -->
+<div class="md:col-span-2 md:row-span-2 glass-card rounded-3xl p-8 flex flex-col justify-between group hover:border-primary/40 transition-all duration-500 cursor-pointer relative overflow-hidden neon-glow-purple">
+<div class="absolute top-0 right-0 w-full h-full opacity-10 group-hover:opacity-20 transition-opacity duration-700 pointer-events-none">
+<img alt="Japanese culinary detail" class="w-full h-full object-cover" data-alt="close-up of exquisite japanese sushi and sashimi arranged on dark stone plate with moody atmospheric lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIHat-M-txjvC5Uf2J5MYWxQQ8fg7iOva_2feacv4wyZ7ZNjZtNjEslR06ocqlbTm7wGSKcAl8OFjX2_fHJGfLWFTU6FmaSes36E6BiZcJIIBrAIO5EKL40F_sYv4m-VAP5-MaXsNz7iSboq0YeZh2yZ8MQfyFDjN0kpgqN-GS4nFDV1TQEjlKNdRYPe1w0EmMzDKEgPFjUfe4Xp6LXTHGK_ssqVeYMwiBw8wxBw2SnXm4eIj1vNS0-E_Hi3gG-rHHFVSOSfSry0m2"/>
+</div>
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-12">
+<span class="bg-primary/20 text-primary px-4 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">12 Lessons</span>
+<span class="material-symbols-outlined text-primary" data-icon="restaurant">restaurant</span>
+</div>
+<div class="kanji-focus text-secondary mb-4 font-headline">食</div>
+</div>
+<div class="relative z-10">
+<h3 class="font-headline text-3xl font-bold mb-2">Food</h3>
+<p class="text-on-surface-variant leading-relaxed max-w-xs">Master culinary vocabulary from street food to kaiseki dining.</p>
+</div>
+</div>
+<!-- Animals Card -->
+<div class="md:col-span-2 glass-card rounded-3xl p-6 flex flex-row items-center gap-6 group hover:border-secondary/40 transition-all duration-500 cursor-pointer neon-glow-cyan">
+<div class="w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 relative">
+<img alt="Japanese temple deer" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="a majestic sika deer standing quietly in a misty japanese forest with soft cool lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCimWUOxWRxF2xAVu_Dm_Wv_h5gUn6mr4aSHYevg0iI-ZUJb5ik09pGIBoEJqbiX74_j7Rc7eeVCd8LKbIOt3IOoRT8dI5cIytVB7XKPg4omFNu93-b5S9_8dHKjiUoE6qtZhvLTufFGGoqsdCn2pnJwtga8l5Pug-EI83P9P6Q-H-tl2o4KEXOAGRYlJGRwdzOnm0XGpAMuUmjl-bY7qB_HmKerzZPabXlJR9wk911IeUICerSKGPzQbcj4tw_z5AkJqBWS7P5cOTL"/>
+<div class="absolute inset-0 bg-secondary/10"></div>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-center mb-1">
+<span class="font-headline text-xl font-bold">Animals</span>
+<span class="text-2xl font-headline text-secondary">獣</span>
+</div>
+<p class="text-sm text-on-surface-variant">Wildlife and domestic companions.</p>
+<div class="mt-4 flex items-center gap-2">
+<div class="flex-grow h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-1/3"></div>
+</div>
+<span class="text-[10px] font-bold text-secondary">33%</span>
+</div>
+</div>
+</div>
+<!-- Slang Card -->
+<div class="glass-card rounded-3xl p-6 flex flex-col justify-between group hover:border-tertiary/40 transition-all duration-500 cursor-pointer neon-glow-purple">
+<div class="space-y-4">
+<div class="w-10 h-10 rounded-full bg-tertiary/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+</div>
+<div>
+<h4 class="font-headline text-lg font-bold">Slang</h4>
+<span class="text-tertiary font-headline text-2xl">俗</span>
+</div>
+</div>
+<p class="text-xs text-on-surface-variant mt-4">Modern casual linguistics.</p>
+</div>
+<!-- Travel Card -->
+<div class="glass-card rounded-3xl p-6 flex flex-col justify-between group hover:border-primary/40 transition-all duration-500 cursor-pointer neon-glow-purple">
+<div class="space-y-4">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="flight">flight</span>
+</div>
+<div>
+<h4 class="font-headline text-lg font-bold">Travel</h4>
+<span class="text-primary font-headline text-2xl">旅</span>
+</div>
+</div>
+<p class="text-xs text-on-surface-variant mt-4">Navigate Japan with ease.</p>
+</div>
+</div>
+<!-- Secondary Section: Daily Challenge -->
+<section class="mt-12">
+<div class="flex justify-between items-center mb-6">
+<h2 class="font-headline text-2xl font-bold tracking-tight">Daily Precision</h2>
+<button class="text-sm font-bold text-secondary flex items-center gap-2 hover:gap-3 transition-all">
+                    VIEW ALL <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="glass-card rounded-3xl p-1 bg-gradient-to-br from-white/10 to-transparent">
+<div class="bg-surface-container-lowest rounded-[1.4rem] p-6 flex flex-col md:flex-row items-center gap-8">
+<div class="w-full md:w-1/3 aspect-square rounded-2xl bg-surface-container-high flex items-center justify-center relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-tr from-primary/5 to-secondary/5"></div>
+<span class="text-[8rem] font-headline text-on-background relative z-10">道</span>
+</div>
+<div class="flex-grow space-y-6">
+<div>
+<span class="text-secondary font-bold font-label text-xs tracking-widest uppercase">Kanji of the Day</span>
+<h3 class="text-3xl font-headline font-bold mt-1">Dō (Road / Path)</h3>
+<p class="text-on-surface-variant mt-3 leading-relaxed">Fundamental to Japanese philosophy, representing not just a physical road but a way of living or a spiritual path (as in Bushidō or Sadō).</p>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-4 rounded-2xl bg-surface-container flex flex-col">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Onyomi</span>
+<span class="text-xl font-headline font-medium text-primary">ドウ (dō)</span>
+</div>
+<div class="p-4 rounded-2xl bg-surface-container flex flex-col">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Kunyomi</span>
+<span class="text-xl font-headline font-medium text-secondary">みち (michi)</span>
+</div>
+</div>
+<button class="w-full py-4 rounded-2xl bg-gradient-to-r from-primary-container to-primary font-bold text-on-primary shadow-[0_10px_20px_-5px_rgba(124,58,237,0.5)] active:scale-95 transition-transform">
+                            PRACTICE WRITING
+                        </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-8 w-full z-50 flex justify-around items-center px-4">
+<div class="bg-slate-900/20 backdrop-blur-2xl w-[90%] max-w-md rounded-full border border-white/15 flex justify-around items-center px-4 py-3 shadow-[0_0_20px_rgba(210,187,255,0.1)]">
+<button class="bg-purple-500/20 text-purple-200 p-3 rounded-full shadow-[0_0_15px_rgba(210,187,255,0.3)] active:scale-90 duration-300 ease-out">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+</button>
+<button class="text-slate-500 p-3 hover:text-cyan-200 transition-all active:scale-90 duration-300 ease-out">
+<span class="material-symbols-outlined" data-icon="style">style</span>
+</button>
+<button class="text-slate-500 p-3 hover:text-cyan-200 transition-all active:scale-90 duration-300 ease-out">
+<span class="material-symbols-outlined" data-icon="widgets">widgets</span>
+</button>
+<button class="text-slate-500 p-3 hover:text-cyan-200 transition-all active:scale-90 duration-300 ease-out">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</div>
+</nav>
+</body></html>
