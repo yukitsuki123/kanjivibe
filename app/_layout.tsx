@@ -57,6 +57,14 @@ function AppShell() {
           name="sentence-builder"
           options={{ animation: 'slide_from_bottom', presentation: 'modal' }}
         />
+        <Stack.Screen
+          name="category/[id]"
+          options={{ animation: 'slide_from_right' }}
+        />
+        <Stack.Screen
+          name="quiz-config"
+          options={{ animation: 'slide_from_bottom', presentation: 'modal' }}
+        />
       </Stack>
     </View>
   );

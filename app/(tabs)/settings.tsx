@@ -15,7 +15,7 @@ import {
   ChevronRight, 
   Moon, 
   Type, 
-  Github, 
+  Code, 
   Heart 
 } from 'lucide-react-native';
 import { Colors, Radius, Glass } from '../../constants/theme';
@@ -50,26 +50,7 @@ function SettingsScreen() {
         <View>
           <Text style={styles.sectionLabel}>APPEARANCE</Text>
           <GlassCard glow="none" style={styles.settingsCard}>
-            {/* Dark Mode */}
-            <View style={styles.settingRow}>
-              <View style={styles.settingLeft}>
-                <View style={[styles.settingIcon, { backgroundColor: `${Colors.primary}20` }]}>
-                  <Moon size={18} color={Colors.primary} />
-                </View>
-                <View>
-                  <Text style={styles.settingTitle}>Dark Mode</Text>
-                  <Text style={styles.settingDesc}>Liquid Glass Darknight theme</Text>
-                </View>
-              </View>
-              <Switch
-                value={state.darkMode}
-                onValueChange={setDarkMode}
-                trackColor={{ false: Colors.surfaceContainerHighest, true: `${Colors.primary}60` }}
-                thumbColor={state.darkMode ? Colors.primary : Colors.onSurfaceVariant}
-              />
-            </View>
 
-            <View style={styles.divider} />
 
             {/* Font Size */}
             <View style={styles.settingColumn}>
@@ -205,7 +186,7 @@ function SettingsScreen() {
               <View style={styles.divider} />
 
               <TouchableOpacity style={styles.aboutLink}>
-                <Github size={16} color={Colors.onSurfaceVariant} />
+                <Code size={16} color={Colors.onSurfaceVariant} />
                 <Text style={styles.aboutLinkText}>Follow on GitHub</Text>
                 <ChevronRight size={14} color={Colors.onSurfaceVariant} />
               </TouchableOpacity>

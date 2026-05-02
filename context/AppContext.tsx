@@ -1,6 +1,6 @@
 /**
  * KanjiVibe — Global App Context
- * Manages romaji toggle, SRS progress, user stats, and per-module scores
+ * Manages romaji toggle, SM-2 SRS progress, user stats, daily analytics, and per-module scores
  */
 
 import React, { createContext, useContext, useReducer, useEffect, useCallback, ReactNode } from 'react';
@@ -26,7 +26,15 @@ interface UserStats {
   dailyGoal: number;
   dailyProgress: number;
   monthlyMastered: number;
-  moduleScores: Record<string, number>; // Per-module high scores or progress
+  moduleScores: Record<string, number>;
+  // Daily answer tracking
+  dailyCorrect: number;
+  dailyAnswered: number;
+  // Weekly analytics [Mon=0 .. Sun=6]
+  weeklyCorrect: number[];
+  weeklyAnswered: number[];
+  weeklyKanji: number;
+  weeklyVocab: number;
 }
 
 export type FontSize = 'small' | 'medium' | 'large';
@@ -47,12 +55,13 @@ type AppAction =
   | { type: 'SET_FONT_SIZE'; payload: FontSize }
   | { type: 'REVIEW_KNOWN'; payload: string }
   | { type: 'REVIEW_UNKNOWN'; payload: string }
+  | { type: 'RECORD_ANSWER'; payload: { correct: boolean; wordType: 'kanji' | 'vocab' } }
   | { type: 'ADD_ACTIVITY'; payload: Omit<Activity, 'id'> }
   | { type: 'SET_DAILY_GOAL'; payload: number }
   | { type: 'UPDATE_MODULE_SCORE'; payload: { category: string; score: number } }
   | { type: 'LOAD_STATE'; payload: Partial<AppState> }
-  | { type: 'SET_READY'; }
-  | { type: 'RESET_PROGRESS'; };
+  | { type: 'SET_READY' }
+  | { type: 'RESET_PROGRESS' };
 
 // ─── Initial State ───────────────────────────────────────────────────
 
@@ -66,6 +75,12 @@ const defaultStats: UserStats = {
   dailyProgress: 0,
   monthlyMastered: 0,
   moduleScores: {},
+  dailyCorrect: 0,
+  dailyAnswered: 0,
+  weeklyCorrect: [0, 0, 0, 0, 0, 0, 0],
+  weeklyAnswered: [0, 0, 0, 0, 0, 0, 0],
+  weeklyKanji: 0,
+  weeklyVocab: 0,
 };
 
 const initialState: AppState = {
@@ -77,6 +92,14 @@ const initialState: AppState = {
   recentActivity: [],
   ready: false,
 };
+
+// ─── Helpers ─────────────────────────────────────────────────────────
+
+function getDayIndex(): number {
+  // 0=Mon, 1=Tue, ... 6=Sun
+  const d = new Date().getDay();
+  return d === 0 ? 6 : d - 1;
+}
 
 // ─── Reducer ─────────────────────────────────────────────────────────
 
@@ -117,6 +140,32 @@ function appReducer(state: AppState, action: AppAction): AppState {
       };
     }
 
+    case 'RECORD_ANSWER': {
+      const { correct, wordType } = action.payload;
+      const dayIdx = getDayIndex();
+      const newWeeklyCorrect = [...state.stats.weeklyCorrect];
+      const newWeeklyAnswered = [...state.stats.weeklyAnswered];
+      if (correct) newWeeklyCorrect[dayIdx] = (newWeeklyCorrect[dayIdx] || 0) + 1;
+      newWeeklyAnswered[dayIdx] = (newWeeklyAnswered[dayIdx] || 0) + 1;
+      const xpGain = correct ? 5 : 0;
+      const newXp = state.stats.xp + xpGain;
+      return {
+        ...state,
+        stats: {
+          ...state.stats,
+          xp: newXp,
+          level: Math.floor(newXp / 100) + 1,
+          dailyCorrect: correct ? state.stats.dailyCorrect + 1 : state.stats.dailyCorrect,
+          dailyAnswered: state.stats.dailyAnswered + 1,
+          dailyProgress: state.stats.dailyProgress + 1,
+          weeklyCorrect: newWeeklyCorrect,
+          weeklyAnswered: newWeeklyAnswered,
+          weeklyKanji: wordType === 'kanji' ? state.stats.weeklyKanji + 1 : state.stats.weeklyKanji,
+          weeklyVocab: wordType === 'vocab' ? state.stats.weeklyVocab + 1 : state.stats.weeklyVocab,
+        },
+      };
+    }
+
     case 'ADD_ACTIVITY':
       return {
         ...state,
@@ -126,7 +175,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
         ],
       };
 
-    case 'UPDATE_MODULE_SCORE':
+    case 'UPDATE_MODULE_SCORE': {
       const currentScore = state.stats.moduleScores[action.payload.category] || 0;
       return {
         ...state,
@@ -138,6 +187,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
           }
         }
       };
+    }
 
     case 'SET_DAILY_GOAL':
       return { ...state, stats: { ...state.stats, dailyGoal: action.payload } };
@@ -165,6 +215,7 @@ interface AppContextValue {
   setFontSize: (val: FontSize) => void;
   reviewKnownWord: (wordId: string) => void;
   reviewUnknownWord: (wordId: string) => void;
+  recordAnswer: (correct: boolean, wordType: 'kanji' | 'vocab') => void;
   addActivity: (title: string, type: Activity['type']) => void;
   updateModuleScore: (category: string, score: number) => void;
   setDailyGoal: (goal: number) => void;
@@ -184,10 +235,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const saved = await AsyncStorage.getItem('@kanjivibe_state');
         if (saved) {
           const parsed = JSON.parse(saved);
-          
+
           // Ensure nested objects exist
           if (parsed.stats) {
             parsed.stats.moduleScores = parsed.stats.moduleScores || {};
+            parsed.stats.dailyCorrect = parsed.stats.dailyCorrect ?? 0;
+            parsed.stats.dailyAnswered = parsed.stats.dailyAnswered ?? 0;
+            parsed.stats.weeklyCorrect = parsed.stats.weeklyCorrect ?? [0,0,0,0,0,0,0];
+            parsed.stats.weeklyAnswered = parsed.stats.weeklyAnswered ?? [0,0,0,0,0,0,0];
+            parsed.stats.weeklyKanji = parsed.stats.weeklyKanji ?? 0;
+            parsed.stats.weeklyVocab = parsed.stats.weeklyVocab ?? 0;
           }
           parsed.recentActivity = parsed.recentActivity || [];
 
@@ -196,6 +253,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
             parsed.stats = {
               ...parsed.stats,
               dailyProgress: 0,
+              dailyCorrect: 0,
+              dailyAnswered: 0,
               lastStudyDate: today,
               streak: parsed.stats?.lastStudyDate === yesterday() ? (parsed.stats?.streak || 0) + 1 : 1,
             };
@@ -227,16 +286,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const setFontSize = useCallback((val: FontSize) => dispatch({ type: 'SET_FONT_SIZE', payload: val }), []);
   const reviewKnownWord = useCallback((id: string) => dispatch({ type: 'REVIEW_KNOWN', payload: id }), []);
   const reviewUnknownWord = useCallback((id: string) => dispatch({ type: 'REVIEW_UNKNOWN', payload: id }), []);
-  const addActivity = useCallback((title: string, type: Activity['type']) => 
+  const recordAnswer = useCallback((correct: boolean, wordType: 'kanji' | 'vocab') =>
+    dispatch({ type: 'RECORD_ANSWER', payload: { correct, wordType } }), []);
+  const addActivity = useCallback((title: string, type: Activity['type']) =>
     dispatch({ type: 'ADD_ACTIVITY', payload: { title, type, timestamp: new Date().toISOString() } }), []);
-  const updateModuleScore = useCallback((category: string, score: number) => 
+  const updateModuleScore = useCallback((category: string, score: number) =>
     dispatch({ type: 'UPDATE_MODULE_SCORE', payload: { category, score } }), []);
   const setDailyGoal = useCallback((goal: number) => dispatch({ type: 'SET_DAILY_GOAL', payload: goal }), []);
   const resetProgress = useCallback(() => dispatch({ type: 'RESET_PROGRESS' }), []);
 
   return (
-    <AppContext.Provider value={{ 
-      state, toggleRomaji, setDarkMode, setFontSize, reviewKnownWord, reviewUnknownWord, addActivity, updateModuleScore, setDailyGoal, resetProgress 
+    <AppContext.Provider value={{
+      state, toggleRomaji, setDarkMode, setFontSize, reviewKnownWord, reviewUnknownWord,
+      recordAnswer, addActivity, updateModuleScore, setDailyGoal, resetProgress
     }}>
       {children}
     </AppContext.Provider>

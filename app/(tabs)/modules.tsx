@@ -1,269 +1,335 @@
 /**
- * KanjiVibe — Module Selection Screen
- * Centered layout with organic blob cards matching the design mockup
+ * KanjiVibe — Modules Tab
+ * 2-column bento grid of all 14 categories with SRS progress and quick actions
  */
 
-import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useMemo, useCallback } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArrowRight, Waves, Sparkles, Lock, User } from 'lucide-react-native';
+import { Trophy, Zap, BookOpen, ArrowRight } from 'lucide-react-native';
 import { Colors, Radius, Glass, Shadows } from '../../constants/theme';
 import { FontFamily } from '../../constants/typography';
-import { GlassCard } from '../../components/ui/GlassCard';
-import { NeonButton } from '../../components/ui/NeonButton';
-import { OrganicBlob } from '../../components/ui/OrganicBlob';
 import { useApp } from '../../context/AppContext';
-import { modules } from '../../data/modules';
-import { getKanjiOfTheDay } from '../../data/curriculum';
+import { modules, Module } from '../../data/modules';
+import { getCategoryWordCount, Category, allWords } from '../../data/curriculum';
+import { isDue } from '../../utils/srs';
 
-const accentColors = {
+const { width: SCREEN_W } = Dimensions.get('window');
+const CARD_W = (SCREEN_W - 48) / 2;
+
+const ACCENT_COLORS: Record<string, string> = {
   primary: Colors.primary,
   secondary: Colors.secondary,
   tertiary: Colors.tertiary,
   neutral: Colors.onSurface,
 };
 
-const glowShadows = {
-  primary: Shadows.purpleGlow,
-  secondary: Shadows.cyanGlow,
-  tertiary: Shadows.magentaGlow,
-  neutral: {},
-};
-
-function ModulesScreen() {
+export default function ModulesScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { state } = useApp();
-  const kanjiOfDay = getKanjiOfTheDay();
 
-  const getButtonVariant = (level: string): 'primary' | 'secondary' | 'tertiary' | 'glass' => {
-    if (level === 'beginner') return 'primary';
-    if (level === 'intermediate') return 'secondary';
-    if (level === 'advanced') return 'tertiary';
-    return 'glass';
-  };
+  const moduleStats = useMemo(() => {
+    return modules.map(mod => {
+      const category = mod.categories[0] as Category;
+      const totalWords = getCategoryWordCount(category);
+      const learnedWords = Object.values(state.srsCards).filter(c => {
+        const word = allWords.find(w => w.id === c.wordId);
+        return word && word.category === category && c.repetitions >= 3;
+      }).length;
+      const dueWords = Object.values(state.srsCards).filter(c => {
+        const word = allWords.find(w => w.id === c.wordId);
+        return word && word.category === category && isDue(c);
+      }).length;
+      const progress = totalWords > 0 ? Math.min(learnedWords / totalWords, 1) : 0;
+      const bestScore = state.stats.moduleScores[category] || 0;
+      return { ...mod, totalWords, learnedWords, dueWords, progress, bestScore };
+    });
+  }, [state.srsCards, state.stats.moduleScores]);
 
-  const getIcon = (iconName: string) => {
-    switch (iconName) {
-      case 'ArrowRight': return <ArrowRight size={14} color={Colors.onPrimary} />;
-      case 'Waves': return <Waves size={14} color={Colors.secondary} />;
-      case 'Sparkles': return <Sparkles size={14} color={Colors.tertiary} />;
-      case 'Lock': return <Lock size={14} color="#64748b" />;
-      default: return null;
-    }
-  };
+  const renderCard = useCallback((mod: typeof moduleStats[0]) => {
+    const accent = ACCENT_COLORS[mod.accentColor] || Colors.primary;
+    return (
+      <TouchableOpacity
+        key={mod.id}
+        style={[styles.card, { borderColor: `${accent}18` }]}
+        onPress={() => router.push(`/quiz-config?category=${mod.categories[0]}`)}
+        activeOpacity={0.8}
+      >
+        {/* Blob bg */}
+        <View style={[styles.blob, { backgroundColor: `${accent}12` }]} />
+
+        {/* Top: kanji + score badge */}
+        <View style={styles.cardTop}>
+          <Text style={[styles.cardKanji, { color: accent }]}>{mod.kanji}</Text>
+          {mod.bestScore > 0 && (
+            <View style={styles.scoreBadge}>
+              <Trophy size={9} color={Colors.tertiary} />
+              <Text style={styles.scoreBadgeText}>{mod.bestScore}</Text>
+            </View>
+          )}
+        </View>
+
+        {/* Name + count */}
+        <Text style={styles.cardTitle}>{mod.title}</Text>
+        <Text style={styles.cardSub}>{mod.totalWords} words</Text>
+
+        {/* Progress bar */}
+        <View style={styles.progressTrack}>
+          <View
+            style={[
+              styles.progressFill,
+              { width: `${mod.progress * 100}%`, backgroundColor: accent },
+            ]}
+          />
+        </View>
+
+        {/* Due badge */}
+        {mod.dueWords > 0 && (
+          <View style={[styles.dueBadge, { backgroundColor: `${Colors.tertiary}20` }]}>
+            <Text style={[styles.dueBadgeText, { color: Colors.tertiary }]}>
+              {mod.dueWords} due
+            </Text>
+          </View>
+        )}
+
+        {/* Actions */}
+        <View style={styles.cardActions}>
+          <TouchableOpacity
+            style={[styles.actionBtn, { backgroundColor: `${accent}15` }]}
+            onPress={() =>
+              router.push(`/learning?category=${mod.categories[0]}&mode=flashcards`)
+            }
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <BookOpen size={12} color={accent} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionBtn, { backgroundColor: `${accent}15` }]}
+            onPress={() => router.push(`/quiz-config?category=${mod.categories[0]}`)}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Zap size={12} color={accent} />
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    );
+  }, [router]);
 
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
-      {/* Modules Content */}
-
-      {/* Top Bar */}
-      <View style={styles.topBar}>
-        <View style={styles.topBarLeft}>
-          <View style={styles.gridIcon}>
-            <View style={styles.gridDot} /><View style={styles.gridDot} />
-            <View style={styles.gridDot} /><View style={styles.gridDot} />
-          </View>
-          <Text style={styles.brand}>KANJIVIBE</Text>
+      {/* Header */}
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.headerLabel}>STUDY CATALOG</Text>
+          <Text style={styles.headerTitle}>Modules</Text>
         </View>
-        <TouchableOpacity style={styles.avatarBtn}>
-          <User size={20} color={Colors.primary} />
-        </TouchableOpacity>
+      </View>
+
+      {/* Summary strip */}
+      <View style={styles.summaryRow}>
+        <View style={styles.summaryChip}>
+          <Text style={styles.summaryVal}>{modules.length}</Text>
+          <Text style={styles.summaryLabel}>Categories</Text>
+        </View>
+        <View style={styles.summaryChip}>
+          <Text style={[styles.summaryVal, { color: Colors.secondary }]}>
+            {Object.values(state.srsCards).filter(c => c.repetitions >= 3).length}
+          </Text>
+          <Text style={styles.summaryLabel}>Learned</Text>
+        </View>
+        <View style={styles.summaryChip}>
+          <Text style={[styles.summaryVal, { color: Colors.tertiary }]}>
+            {Object.values(state.srsCards).filter(c => isDue(c)).length}
+          </Text>
+          <Text style={styles.summaryLabel}>Due</Text>
+        </View>
       </View>
 
       <ScrollView
-        contentContainerStyle={[styles.content, { paddingBottom: 120 }]}
+        contentContainerStyle={[styles.grid, { paddingBottom: insets.bottom + 100 }]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Hero */}
-        <View>
-          <Text style={styles.heroTitle}>Select Your Path</Text>
-          <Text style={styles.heroSubtitle}>
-            Master the strokes of destiny. Choose a module to begin your journey through the neon nocturnal world of Kanji.
-          </Text>
-        </View>
-
-        {/* Module Cards */}
-        {modules.map((mod, index) => {
-          const accent = accentColors[mod.accentColor];
-          const shadow = glowShadows[mod.accentColor];
-          const isLocked = mod.level === 'locked';
-
-          return (
-            <View
-              key={mod.id}
-            >
-              <View style={[styles.moduleOuter, shadow]}>
-                {/* Glow border */}
-                <View style={[styles.glowBorder, { borderColor: `${accent}15` }]} />
-                <View style={[styles.moduleCard]}>
-                  {/* Organic blob bg */}
-                  <View style={[styles.blobBg, { backgroundColor: `${accent}15` }]} />
-
-                  {/* Kanji + Badge */}
-                  <View style={styles.moduleHeader}>
-                    <Text style={[styles.moduleKanji, { color: accent, textShadowColor: `${accent}60` }]}>
-                      {mod.kanji}
-                    </Text>
-                    <View style={[styles.levelBadge, { backgroundColor: `${accent}15`, borderColor: `${accent}30` }]}>
-                      <Text style={[styles.levelBadgeText, { color: accent }]}>
-                        {mod.subtitle}
-                      </Text>
-                    </View>
-                    {state.stats?.moduleScores?.[mod.categories[0]] !== undefined && (
-                      <View style={styles.scoreBadge}>
-                        <Trophy size={10} color={Colors.tertiary} />
-                        <Text style={styles.scoreBadgeText}>BEST: {state.stats.moduleScores[mod.categories[0]]}</Text>
-                      </View>
-                    )}
-                  </View>
-
-                  {/* Title & Description */}
-                  <Text style={styles.moduleTitle}>{mod.title}</Text>
-                  <Text style={styles.moduleDesc}>{mod.description}</Text>
-
-                  {/* Button */}
-                  {isLocked ? (
-                    <View style={styles.lockedBtn}>
-                      <Text style={styles.lockedText}>LOCKED</Text>
-                      <Lock size={12} color="#64748b" />
-                    </View>
-                  ) : (
-                    <NeonButton
-                      label={mod.buttonLabel}
-                      onPress={() => router.push(`/learning?category=${mod.categories[0]}`)}
-                      variant={getButtonVariant(mod.level)}
-                      icon={getIcon(mod.buttonIcon)}
-                      fullWidth
-                      style={{ marginTop: 16 }}
-                    />
-                  )}
-                </View>
-              </View>
-            </View>
-          );
-        })}
-
-        {/* Featured Character */}
-        <View>
-          <GlassCard glow="none" noPadding style={styles.featuredOuter}>
-            <View style={styles.featuredCard}>
-              {/* Kanji visual */}
-              <View style={styles.featuredKanjiWrap}>
-                <View style={styles.featuredKanjiBg} />
-                <Text style={styles.featuredKanji}>{kanjiOfDay.kanji}</Text>
-                <Text style={styles.featuredKanjiLabel}>
-                  {kanjiOfDay.english.toUpperCase()} / {kanjiOfDay.romaji?.toUpperCase()}
-                </Text>
-              </View>
-
-              {/* Details */}
-              <View style={styles.featuredDetails}>
-                <View style={styles.cotdBadge}>
-                  <Text style={styles.cotdBadgeText}>CHARACTER OF THE DAY</Text>
-                </View>
-                <Text style={styles.featuredTitle}>Illuminate Your Learning</Text>
-                <Text style={styles.featuredDesc}>
-                  Let this character guide your study session today. Tap to begin a quick study module.
-                </Text>
-                <TouchableOpacity
-                  style={styles.quickStudyLink}
-                  onPress={() => router.push(`/learning?category=${kanjiOfDay.category}`)}
-                >
-                  <Text style={styles.quickStudyText}>QUICK STUDY MODULE</Text>
-                  <ArrowRight size={12} color={Colors.primary} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          </GlassCard>
-        </View>
+        {moduleStats.map(renderCard)}
       </ScrollView>
-
-
     </View>
   );
 }
 
-export default ModulesScreen;
-
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: Colors.surface },
-  topBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 12 },
-  topBarLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  gridIcon: { width: 20, height: 20, flexDirection: 'row', flexWrap: 'wrap', gap: 3, alignItems: 'center', justifyContent: 'center' },
-  gridDot: { width: 7, height: 7, borderRadius: 2, backgroundColor: Colors.primary, opacity: 0.8 },
-  brand: { fontFamily: FontFamily.headline, fontSize: 20, color: Colors.primary, letterSpacing: -1, textShadowColor: 'rgba(210,187,255,0.4)', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 8 },
-  avatarBtn: { padding: 8, borderRadius: Radius.lg },
 
-  content: { paddingHorizontal: 20, gap: 24, paddingTop: 8 },
-  heroTitle: { fontFamily: FontFamily.headline, fontSize: 38, color: Colors.onSurface, letterSpacing: -1, marginBottom: 8 },
-  heroSubtitle: { fontFamily: FontFamily.body, fontSize: 15, color: Colors.onSurfaceVariant, lineHeight: 22, maxWidth: 340 },
-
-  // Module cards
-  moduleOuter: { borderRadius: Radius.xl, overflow: 'visible' },
-  glowBorder: { ...StyleSheet.absoluteFillObject, borderRadius: Radius.xl + 2, borderWidth: 1, margin: -1, opacity: 0.3 },
-  moduleCard: {
-    backgroundColor: Glass.background,
-    borderWidth: 1,
-    borderColor: Glass.borderSubtle,
-    borderRadius: Radius.xl,
-    padding: 28,
-    overflow: 'hidden',
-    alignItems: 'center',
+  // Header
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 12,
   },
-  blobBg: {
-    position: 'absolute',
-    width: 200,
-    height: 200,
-    borderTopLeftRadius: 120,
-    borderTopRightRadius: 160,
-    borderBottomLeftRadius: 180,
-    borderBottomRightRadius: 100,
-    top: '50%',
-    left: '50%',
-    transform: [{ translateX: -100 }, { translateY: -100 }],
-    opacity: 0.3,
+  headerLabel: {
+    fontFamily: FontFamily.labelBold,
+    fontSize: 10,
+    color: Colors.onSurfaceVariant,
+    letterSpacing: 2,
+    marginBottom: 4,
   },
-  moduleHeader: { alignItems: 'center', gap: 12, marginBottom: 16 },
-  moduleKanji: { fontFamily: FontFamily.headline, fontSize: 56, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 15 },
-  levelBadge: { paddingHorizontal: 14, paddingVertical: 4, borderRadius: Radius.full, borderWidth: 1 },
-  levelBadgeText: { fontFamily: FontFamily.labelBold, fontSize: 9, letterSpacing: 2, textTransform: 'uppercase' },
-  scoreBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(255,255,255,0.05)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: Radius.full, marginTop: 4 },
-  scoreBadgeText: { fontFamily: FontFamily.labelBold, fontSize: 8, color: Colors.tertiary, letterSpacing: 1 },
-  moduleTitle: { fontFamily: FontFamily.headline, fontSize: 22, color: Colors.onSurface, marginBottom: 8, textAlign: 'center' },
-  moduleDesc: { fontFamily: FontFamily.body, fontSize: 13, color: Colors.onSurfaceVariant, lineHeight: 20, textAlign: 'center' },
-  lockedBtn: {
-    marginTop: 16,
-    width: '100%',
-    paddingVertical: 16,
-    borderRadius: Radius.lg,
-    backgroundColor: `${Colors.surfaceContainerHighest}80`,
-    borderWidth: 1,
-    borderColor: Glass.borderGhost,
+  headerTitle: {
+    fontFamily: FontFamily.headline,
+    fontSize: 32,
+    color: Colors.onSurface,
+    letterSpacing: -0.5,
+  },
+  challengeBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
+    gap: 6,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: Radius.full,
   },
-  lockedText: { fontFamily: FontFamily.labelBold, fontSize: 10, letterSpacing: 2, color: '#64748b' },
+  challengeBtnText: {
+    fontFamily: FontFamily.labelBold,
+    fontSize: 12,
+    color: Colors.surface,
+  },
 
-  // Featured
-  featuredOuter: { borderRadius: Radius['2xl'], overflow: 'hidden' },
-  featuredCard: { overflow: 'hidden' },
-  featuredKanjiWrap: { width: '100%', height: 200, backgroundColor: Colors.surfaceContainerHigh, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-  featuredKanjiBg: { ...StyleSheet.absoluteFillObject, backgroundColor: Colors.secondary, opacity: 0.03 },
-  featuredKanji: { fontFamily: FontFamily.headline, fontSize: 80, color: Colors.secondary, textShadowColor: 'rgba(211,251,255,0.5)', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 20 },
-  featuredKanjiLabel: { fontFamily: FontFamily.headline, fontSize: 10, letterSpacing: 4, color: `${Colors.secondary}90`, marginTop: 8 },
-  featuredDetails: { padding: 28 },
-  cotdBadge: { backgroundColor: `${Colors.primary}25`, alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 4, borderRadius: Radius.full, marginBottom: 12 },
-  cotdBadgeText: { fontFamily: FontFamily.labelBold, fontSize: 9, letterSpacing: 2, color: Colors.primary },
-  featuredTitle: { fontFamily: FontFamily.headline, fontSize: 24, color: Colors.onSurface, marginBottom: 8 },
-  featuredDesc: { fontFamily: FontFamily.body, fontSize: 13, color: Colors.onSurfaceVariant, lineHeight: 20, marginBottom: 16 },
-  quickStudyLink: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  quickStudyText: { fontFamily: FontFamily.labelBold, fontSize: 11, letterSpacing: 2, color: Colors.primary },
+  // Summary
+  summaryRow: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    gap: 10,
+    marginBottom: 16,
+  },
+  summaryChip: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: Colors.surfaceContainerLow,
+    borderRadius: Radius.lg,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: Glass.border,
+  },
+  summaryVal: {
+    fontFamily: FontFamily.headline,
+    fontSize: 18,
+    color: Colors.primary,
+  },
+  summaryLabel: {
+    fontFamily: FontFamily.label,
+    fontSize: 10,
+    color: Colors.onSurfaceVariant,
+    marginTop: 2,
+  },
 
-  // Decorations
-  floatingRing: { position: 'absolute', width: 200, height: 200, borderRadius: 100, borderWidth: 1, borderColor: `${Colors.primary}15`, opacity: 0.2, pointerEvents: 'none' },
-  floatingRingSm: { position: 'absolute', width: 120, height: 120, borderRadius: 60, borderWidth: 1, borderColor: `${Colors.secondary}15`, opacity: 0.1, pointerEvents: 'none' },
+  // Grid
+  grid: {
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+
+  // Card
+  card: {
+    width: CARD_W,
+    backgroundColor: Colors.surfaceContainerLow,
+    borderRadius: Radius.xl,
+    borderWidth: 1,
+    padding: 14,
+    overflow: 'hidden',
+    position: 'relative',
+    minHeight: 170,
+  },
+  blob: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    top: -10,
+    right: -10,
+  },
+  cardTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 6,
+  },
+  cardKanji: {
+    fontFamily: FontFamily.headline,
+    fontSize: 34,
+  },
+  scoreBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: `${Colors.tertiary}15`,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: Radius.full,
+  },
+  scoreBadgeText: {
+    fontFamily: FontFamily.labelBold,
+    fontSize: 9,
+    color: Colors.tertiary,
+  },
+  cardTitle: {
+    fontFamily: FontFamily.bodySemiBold,
+    fontSize: 13,
+    color: Colors.onSurface,
+    marginBottom: 2,
+  },
+  cardSub: {
+    fontFamily: FontFamily.label,
+    fontSize: 10,
+    color: Colors.onSurfaceVariant,
+    marginBottom: 8,
+  },
+  progressTrack: {
+    height: 3,
+    backgroundColor: 'rgba(255,255,255,0.07)',
+    borderRadius: 2,
+    overflow: 'hidden',
+    marginBottom: 6,
+  },
+  progressFill: {
+    height: 3,
+    borderRadius: 2,
+  },
+  dueBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: Radius.full,
+    marginBottom: 8,
+  },
+  dueBadgeText: {
+    fontFamily: FontFamily.labelBold,
+    fontSize: 9,
+    letterSpacing: 0.5,
+  },
+  cardActions: {
+    position: 'absolute',
+    bottom: 12,
+    right: 10,
+    flexDirection: 'row',
+    gap: 6,
+  },
+  actionBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

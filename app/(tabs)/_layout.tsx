@@ -1,22 +1,15 @@
 /**
- * KanjiVibe — Tab Layout
- * Floating pill-shaped bottom tab bar with glass blur effect
+ * KanjiVibe — Tab Layout (4 tabs: Dashboard | Learn | Modules | Settings)
  */
 
 import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { Tabs } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LayoutDashboard, Layers, Grid3x3, Settings } from 'lucide-react-native';
+import { LayoutDashboard, BookOpen, Grid3x3, Settings } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 import { Colors, Glass, Shadows, Radius } from '../../constants/theme';
 import { FontFamily } from '../../constants/typography';
-
-const TAB_ITEMS = [
-  { name: 'index', label: 'Dashboard', icon: LayoutDashboard },
-  { name: 'modules', label: 'Modules', icon: Grid3x3 },
-  { name: 'settings', label: 'Settings', icon: Settings },
-] as const;
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
@@ -28,11 +21,11 @@ export default function TabLayout() {
         tabBarStyle: {
           position: 'absolute',
           bottom: Math.max(insets.bottom, 12) + 8,
-          left: 24,
-          right: 24,
+          left: 16,
+          right: 16,
           height: 64,
           borderRadius: Radius.full,
-          backgroundColor: 'rgba(15, 23, 42, 0.85)',
+          backgroundColor: 'rgba(15, 23, 42, 0.92)',
           borderTopWidth: 0,
           borderWidth: 1,
           borderColor: Glass.border,
@@ -51,15 +44,14 @@ export default function TabLayout() {
           letterSpacing: 0.5,
           marginTop: 2,
         },
-        tabBarBackground: () => (
+        tabBarBackground: () =>
           Platform.OS === 'ios' ? (
             <BlurView
               intensity={60}
               tint="dark"
               style={[StyleSheet.absoluteFill, { borderRadius: Radius.full, overflow: 'hidden' }]}
             />
-          ) : null
-        ),
+          ) : null,
       }}
     >
       <Tabs.Screen
@@ -68,7 +60,19 @@ export default function TabLayout() {
           title: 'Dashboard',
           tabBarIcon: ({ color, focused }) => (
             <View style={focused ? styles.activeIconWrap : undefined}>
-              <LayoutDashboard size={22} color={color} strokeWidth={focused ? 2.5 : 1.5} />
+              <LayoutDashboard size={20} color={color} strokeWidth={focused ? 2.5 : 1.5} />
+            </View>
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="learn"
+        options={{
+          title: 'Learn',
+          tabBarIcon: ({ color, focused }) => (
+            <View style={focused ? styles.activeIconWrap : undefined}>
+              <BookOpen size={20} color={color} strokeWidth={focused ? 2.5 : 1.5} />
             </View>
           ),
         }}
@@ -80,18 +84,19 @@ export default function TabLayout() {
           title: 'Modules',
           tabBarIcon: ({ color, focused }) => (
             <View style={focused ? styles.activeIconWrap : undefined}>
-              <Grid3x3 size={22} color={color} strokeWidth={focused ? 2.5 : 1.5} />
+              <Grid3x3 size={20} color={color} strokeWidth={focused ? 2.5 : 1.5} />
             </View>
           ),
         }}
       />
+
       <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',
           tabBarIcon: ({ color, focused }) => (
             <View style={focused ? styles.activeIconWrap : undefined}>
-              <Settings size={22} color={color} strokeWidth={focused ? 2.5 : 1.5} />
+              <Settings size={20} color={color} strokeWidth={focused ? 2.5 : 1.5} />
             </View>
           ),
         }}
@@ -104,6 +109,6 @@ const styles = StyleSheet.create({
   activeIconWrap: {
     backgroundColor: 'rgba(124, 58, 237, 0.15)',
     borderRadius: Radius.full,
-    padding: 8,
+    padding: 6,
   },
 });

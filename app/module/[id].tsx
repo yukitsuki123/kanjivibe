@@ -4,10 +4,9 @@
  */
 
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { FlashList } from '@shopify/flash-list';
 import { ArrowLeft, ChevronRight, BookOpen } from 'lucide-react-native';
 import { Colors, Radius, Glass } from '../../constants/theme';
 import { FontFamily } from '../../constants/typography';
@@ -119,10 +118,10 @@ function ModuleDetailScreen() {
 
       {/* Word List */}
       <View style={{ flex: 1 }}>
-        <FlashList
+        <FlatList
           data={words}
           renderItem={renderWord}
-          estimatedItemSize={72}
+          keyExtractor={(item) => item.id}
           contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
           ListEmptyComponent={
