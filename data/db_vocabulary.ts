@@ -6,20 +6,26 @@ export interface VocabularyEntry {
   id: number;
   japanese: string;
   hiragana: string;
+  katakana?: string;
   romaji: string;
   english: string;
   category: string;
   partOfSpeech: string;
+  exampleSentence?: {
+    japanese: string;
+    english: string;
+    romaji?: string;
+  };
 }
 
 export const vocabulary: VocabularyEntry[] = [
   // ADJECTIVES (32)
-  { id: 319, japanese: "大きい", hiragana: "おおきい", romaji: "ookii", english: "big, large", category: "adjectives", partOfSpeech: "i-adj" },
-  { id: 320, japanese: "小さい", hiragana: "ちいさい", romaji: "chiisai", english: "small, little", category: "adjectives", partOfSpeech: "i-adj" },
-  { id: 321, japanese: "新しい", hiragana: "あたらしい", romaji: "atarashii", english: "new", category: "adjectives", partOfSpeech: "i-adj" },
-  { id: 322, japanese: "古い", hiragana: "ふるい", romaji: "furui", english: "old", category: "adjectives", partOfSpeech: "i-adj" },
-  { id: 323, japanese: "高い", hiragana: "たかい", romaji: "takai", english: "tall, expensive", category: "adjectives", partOfSpeech: "i-adj" },
-  { id: 324, japanese: "安い", hiragana: "やすい", romaji: "yasui", english: "cheap, inexpensive", category: "adjectives", partOfSpeech: "i-adj" },
+  { id: 319, japanese: "大きい", hiragana: "おおきい", romaji: "ookii", english: "big, large", category: "adjectives", partOfSpeech: "i-adj", exampleSentence: { japanese: "大きい家ですね。", english: "It's a big house, isn't it?" } },
+  { id: 320, japanese: "小さい", hiragana: "ちいさい", romaji: "chiisai", english: "small, little", category: "adjectives", partOfSpeech: "i-adj", exampleSentence: { japanese: "小さい猫がいます。", english: "There is a small cat." } },
+  { id: 321, japanese: "新しい", hiragana: "あたらしい", romaji: "atarashii", english: "new", category: "adjectives", partOfSpeech: "i-adj", exampleSentence: { japanese: "新しい靴を買いました。", english: "I bought new shoes." } },
+  { id: 322, japanese: "古い", hiragana: "ふるい", romaji: "furui", english: "old", category: "adjectives", partOfSpeech: "i-adj", exampleSentence: { japanese: "古い本が好きです。", english: "I like old books." } },
+  { id: 323, japanese: "高い", hiragana: "たかい", romaji: "takai", english: "tall, expensive", category: "adjectives", partOfSpeech: "i-adj", exampleSentence: { japanese: "この時計は高いです。", english: "This watch is expensive." } },
+  { id: 324, japanese: "安い", hiragana: "やすい", romaji: "yasui", english: "cheap, inexpensive", category: "adjectives", partOfSpeech: "i-adj", exampleSentence: { japanese: "安いスーパーはどこですか。", english: "Where is a cheap supermarket?" } },
   { id: 325, japanese: "いい", hiragana: "いい", romaji: "ii", english: "good", category: "adjectives", partOfSpeech: "i-adj" },
   { id: 326, japanese: "悪い", hiragana: "わるい", romaji: "warui", english: "bad", category: "adjectives", partOfSpeech: "i-adj" },
   { id: 327, japanese: "暑い", hiragana: "あつい", romaji: "atsui", english: "hot (weather)", category: "adjectives", partOfSpeech: "i-adj" },
@@ -118,8 +124,8 @@ export const vocabulary: VocabularyEntry[] = [
   { id: 301, japanese: "黄色", hiragana: "きいろ", romaji: "kiiro", english: "yellow", category: "colors", partOfSpeech: "noun/adj" },
   { id: 302, japanese: "緑", hiragana: "みどり", romaji: "midori", english: "green", category: "colors", partOfSpeech: "noun" },
   { id: 303, japanese: "茶色", hiragana: "ちゃいろ", romaji: "chairo", english: "brown", category: "colors", partOfSpeech: "noun/adj" },
-  { id: 304, japanese: "ピンク", hiragana: "ぴんく", romaji: "pinku", english: "pink", category: "colors", partOfSpeech: "noun" },
-  { id: 305, japanese: "オレンジ", hiragana: "おれんじ", romaji: "orenji", english: "orange", category: "colors", partOfSpeech: "noun" },
+  { id: 304, japanese: "ピンク", hiragana: "ぴんく", katakana: "ピンク", romaji: "pinku", english: "pink", category: "colors", partOfSpeech: "noun" },
+  { id: 305, japanese: "オレンジ", hiragana: "おれんじ", katakana: "オレンジ", romaji: "orenji", english: "orange", category: "colors", partOfSpeech: "noun" },
   { id: 306, japanese: "紫", hiragana: "むらさき", romaji: "murasaki", english: "purple", category: "colors", partOfSpeech: "noun/adj" },
   { id: 436, japanese: "赤", hiragana: "あか", romaji: "aka", english: "red", category: "colors", partOfSpeech: "noun" },
   { id: 437, japanese: "青", hiragana: "あお", romaji: "ao", english: "blue / green (traffic)", category: "colors", partOfSpeech: "noun" },
@@ -128,8 +134,8 @@ export const vocabulary: VocabularyEntry[] = [
   { id: 440, japanese: "黄色", hiragana: "きいろ", romaji: "kiiro", english: "yellow", category: "colors", partOfSpeech: "noun" },
   { id: 441, japanese: "緑", hiragana: "みどり", romaji: "midori", english: "green", category: "colors", partOfSpeech: "noun" },
   { id: 442, japanese: "茶色", hiragana: "ちゃいろ", romaji: "chairo", english: "brown", category: "colors", partOfSpeech: "noun" },
-  { id: 443, japanese: "ピンク", hiragana: "ぴんく", romaji: "pinku", english: "pink", category: "colors", partOfSpeech: "noun" },
-  { id: 444, japanese: "オレンジ", hiragana: "おれんじ", romaji: "orenji", english: "orange", category: "colors", partOfSpeech: "noun" },
+  { id: 443, japanese: "ピンク", hiragana: "ぴんく", katakana: "ピンク", romaji: "pinku", english: "pink", category: "colors", partOfSpeech: "noun" },
+  { id: 444, japanese: "オレンジ", hiragana: "おれんじ", katakana: "オレンジ", romaji: "orenji", english: "orange", category: "colors", partOfSpeech: "noun" },
   { id: 445, japanese: "紫", hiragana: "むらさき", romaji: "murasaki", english: "purple", category: "colors", partOfSpeech: "noun" },
   // CONJUGATION (23)
   { id: 501, japanese: "〜ます", hiragana: "〜ます", romaji: "~masu", english: "polite present/future affirmative (〜ます)", category: "conjugation", partOfSpeech: "verb-ending" },
@@ -183,10 +189,10 @@ export const vocabulary: VocabularyEntry[] = [
   { id: 373, japanese: "子供", hiragana: "こども", romaji: "kodomo", english: "child, children", category: "family", partOfSpeech: "noun" },
   // FOOD (10)
   { id: 374, japanese: "ご飯", hiragana: "ごはん", romaji: "gohan", english: "rice, meal", category: "food", partOfSpeech: "noun" },
-  { id: 375, japanese: "パン", hiragana: "ぱん", romaji: "pan", english: "bread", category: "food", partOfSpeech: "noun" },
+  { id: 375, japanese: "パン", hiragana: "ぱん", katakana: "パン", romaji: "pan", english: "bread", category: "food", partOfSpeech: "noun" },
   { id: 376, japanese: "水", hiragana: "みず", romaji: "mizu", english: "water", category: "food", partOfSpeech: "noun" },
   { id: 377, japanese: "お茶", hiragana: "おちゃ", romaji: "ocha", english: "tea", category: "food", partOfSpeech: "noun" },
-  { id: 378, japanese: "コーヒー", hiragana: "こーひー", romaji: "koohii", english: "coffee", category: "food", partOfSpeech: "noun" },
+  { id: 378, japanese: "コーヒー", hiragana: "こーひー", katakana: "コーヒー", romaji: "koohii", english: "coffee", category: "food", partOfSpeech: "noun" },
   { id: 379, japanese: "肉", hiragana: "にく", romaji: "niku", english: "meat", category: "food", partOfSpeech: "noun" },
   { id: 380, japanese: "野菜", hiragana: "やさい", romaji: "yasai", english: "vegetables", category: "food", partOfSpeech: "noun" },
   { id: 381, japanese: "果物", hiragana: "くだもの", romaji: "kudamono", english: "fruit", category: "food", partOfSpeech: "noun" },
@@ -264,11 +270,11 @@ export const vocabulary: VocabularyEntry[] = [
   { id: 650, japanese: "余り", hiragana: "あまり", romaji: "amari", english: "remainder", category: "math", partOfSpeech: "noun" },
   { id: 651, japanese: "分数", hiragana: "ぶんすう", romaji: "bunsuu", english: "fraction", category: "math", partOfSpeech: "noun" },
   { id: 652, japanese: "小数", hiragana: "しょうすう", romaji: "shousuu", english: "decimal", category: "math", partOfSpeech: "noun" },
-  { id: 653, japanese: "パーセント", hiragana: "ぱーせんと", romaji: "paasento", english: "percent (%)", category: "math", partOfSpeech: "noun" },
+  { id: 653, japanese: "パーセント", hiragana: "ぱーせんと", katakana: "パーセント", romaji: "paasento", english: "percent (%)", category: "math", partOfSpeech: "noun" },
   { id: 654, japanese: "増える", hiragana: "ふえる", romaji: "fueru", english: "to increase", category: "math", partOfSpeech: "ru-verb" },
   { id: 655, japanese: "減る", hiragana: "へる", romaji: "heru", english: "to decrease", category: "math", partOfSpeech: "u-verb" },
-  { id: 656, japanese: "プラス", hiragana: "ぷらす", romaji: "purasu", english: "plus (+)", category: "math", partOfSpeech: "noun" },
-  { id: 657, japanese: "マイナス", hiragana: "まいなす", romaji: "mainasu", english: "minus (-)", category: "math", partOfSpeech: "noun" },
+  { id: 656, japanese: "プラス", hiragana: "ぷらす", katakana: "プラス", romaji: "purasu", english: "plus (+)", category: "math", partOfSpeech: "noun" },
+  { id: 657, japanese: "マイナス", hiragana: "まいなす", katakana: "マイナス", romaji: "mainasu", english: "minus (-)", category: "math", partOfSpeech: "noun" },
   { id: 658, japanese: "以上", hiragana: "いじょう", romaji: "ijou", english: "greater than or equal to / or more", category: "math", partOfSpeech: "noun" },
   { id: 659, japanese: "以下", hiragana: "いか", romaji: "ika", english: "less than or equal to / or less", category: "math", partOfSpeech: "noun" },
   // MONTHS (18)

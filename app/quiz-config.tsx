@@ -15,47 +15,39 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { X, Zap, BookOpen, Eye, Mic, PenLine, Globe, Repeat, Type } from 'lucide-react-native';
+import { X, Zap, BookOpen, Eye, Mic, PenLine, Globe, Repeat, Type, MessageSquare } from 'lucide-react-native';
 import { Colors, Radius, Glass, Shadows } from '../constants/theme';
 import { FontFamily } from '../constants/typography';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 
-type QuizType = 'kanji' | 'hiragana' | 'katakana' | 'vocabulary';
+type QuizType = 'kanji' | 'hiragana';
 
 interface QuizMode {
   id: string;
   label: string;
   description: string;
-  apiMode: 'meaning' | 'reading' | 'character';
+  apiMode: 'meaning' | 'reading' | 'character' | 'onyomi_to_kanji' | 'english_to_hiragana';
   icon: any;
 }
 
 const TYPE_OPTIONS: { id: QuizType; label: string; char: string; color: string }[] = [
   { id: 'kanji', label: 'Kanji', char: '漢', color: Colors.primary },
   { id: 'hiragana', label: 'Hiragana', char: 'あ', color: Colors.secondary },
-  { id: 'katakana', label: 'Katakana', char: 'ア', color: Colors.tertiary },
-  { id: 'vocabulary', label: 'Vocabulary', char: '語', color: '#F97316' },
 ];
 
 const MODES_BY_TYPE: Record<QuizType, QuizMode[]> = {
   kanji: [
-    { id: "meaning", label: "Meaning", description: "See a kanji, guess the English meaning", apiMode: "meaning", icon: Eye },
-    { id: "reading", label: "Reading", description: "See a kanji, guess the onyomi reading", apiMode: "reading", icon: Mic },
-    { id: "writing", label: "Writing", description: "See a meaning, guess the kanji", apiMode: "character", icon: PenLine },
+    { id: "meaning", label: "Kanji to English", description: "See a kanji, guess the English meaning", apiMode: "meaning", icon: Eye },
+    { id: "reading", label: "Kanji to Onyomi", description: "See a kanji, guess the onyomi reading", apiMode: "reading", icon: Mic },
+    { id: "writing", label: "Meaning to Kanji", description: "See a meaning, guess the kanji", apiMode: "character", icon: PenLine },
+    { id: "onyomi_to_kanji", label: "Onyomi to Kanji", description: "See onyomi, guess the kanji", apiMode: "onyomi_to_kanji", icon: Type },
   ],
   hiragana: [
-    { id: "reading", label: "Reading", description: "See a character, choose the romaji", apiMode: "reading", icon: Type },
-    { id: "identifying", label: "Identifying", description: "See romaji, choose the character", apiMode: "character", icon: Eye },
-  ],
-  katakana: [
-    { id: "reading", label: "Reading", description: "See a character, choose the romaji", apiMode: "reading", icon: Type },
-    { id: "identifying", label: "Identifying", description: "See romaji, choose the character", apiMode: "character", icon: Eye },
-  ],
-  vocabulary: [
-    { id: "translation", label: "Translation", description: "See Japanese, choose English meaning", apiMode: "meaning", icon: Globe },
-    { id: "reverse", label: "Reverse", description: "See English, guess the Japanese word", apiMode: "character", icon: Repeat },
-    { id: "reading", label: "Reading", description: "See Japanese, guess the romaji", apiMode: "reading", icon: Mic },
+    { id: "meaning", label: "Hiragana to English", description: "See hiragana, guess the English meaning", apiMode: "meaning", icon: Globe },
+    { id: "reading", label: "Hiragana to Romaji", description: "See hiragana, choose the romaji", apiMode: "reading", icon: Type },
+    { id: "character", label: "Romaji to Hiragana", description: "See romaji, choose the hiragana", apiMode: "character", icon: Eye },
+    { id: "english_to_hiragana", label: "English to Hiragana", description: "See English, choose the hiragana", apiMode: "english_to_hiragana", icon: MessageSquare },
   ],
 };
 
@@ -67,12 +59,10 @@ export default function QuizConfigScreen() {
   const params = useLocalSearchParams<{ category?: string; preType?: string }>();
 
   const resolveInitialType = (): QuizType => {
-    if (params.preType && TYPE_OPTIONS.find(t => t.id === params.preType)) {
+    if (params.preType && (params.preType === 'kanji' || params.preType === 'hiragana')) {
       return params.preType as QuizType;
     }
     if (params.category === 'hiragana') return 'hiragana';
-    if (params.category === 'katakana') return 'katakana';
-    if (params.category && params.category.startsWith('vocab_')) return 'vocabulary';
     return 'kanji';
   };
 
@@ -91,8 +81,6 @@ export default function QuizConfigScreen() {
     if (!cat) {
       if (selectedType === 'kanji') cat = 'kanji_basic';
       if (selectedType === 'hiragana') cat = 'hiragana';
-      if (selectedType === 'katakana') cat = 'katakana';
-      if (selectedType === 'vocabulary') cat = 'vocab_verbs';
     }
 
     router.replace(
@@ -116,29 +104,32 @@ export default function QuizConfigScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Type Selector */}
-        <Text style={styles.sectionLabel}>SELECT TYPE</Text>
-        <View style={styles.typeGrid}>
-          {TYPE_OPTIONS.map(qt => (
-            <TouchableOpacity
-              key={qt.id}
-              style={[
-                styles.typeCard,
-                {
-                  backgroundColor: selectedType === qt.id ? `${qt.color}22` : Colors.surfaceContainer,
-                  borderColor: selectedType === qt.id ? qt.color : Glass.border,
-                },
-              ]}
-              onPress={() => handleTypeSelect(qt.id)}
-              activeOpacity={0.8}
-            >
-              <Text style={[styles.typeChar, { color: qt.color }]}>{qt.char}</Text>
-              <Text style={[styles.typeLabel, { color: selectedType === qt.id ? qt.color : Colors.onSurface }]}>
-                {qt.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        {!(params.category === 'hiragana' || params.category?.startsWith('kanji_')) && (
+          <>
+            <Text style={styles.sectionLabel}>SELECT TYPE</Text>
+            <View style={styles.typeGrid}>
+              {TYPE_OPTIONS.map(qt => (
+                <TouchableOpacity
+                  key={qt.id}
+                  style={[
+                    styles.typeCard,
+                    {
+                      backgroundColor: selectedType === qt.id ? `${qt.color}22` : Colors.surfaceContainer,
+                      borderColor: selectedType === qt.id ? qt.color : Glass.border,
+                    },
+                  ]}
+                  onPress={() => handleTypeSelect(qt.id)}
+                  activeOpacity={0.8}
+                >
+                  <Text style={[styles.typeChar, { color: qt.color }]}>{qt.char}</Text>
+                  <Text style={[styles.typeLabel, { color: selectedType === qt.id ? qt.color : Colors.onSurface }]}>
+                    {qt.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </>
+        )}
 
         {/* Mode Selector */}
         <Text style={styles.sectionLabel}>SELECT MODE</Text>

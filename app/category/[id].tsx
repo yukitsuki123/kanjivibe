@@ -25,7 +25,7 @@ import {
 import { Colors, Radius, Glass } from '../../constants/theme';
 import { FontFamily } from '../../constants/typography';
 import { useApp } from '../../context/AppContext';
-import { getWordsByCategory, JapaneseWord, Category } from '../../data/curriculum';
+import { allWords, JapaneseWord, Category } from '../../data/curriculum';
 import { getModuleById } from '../../data/modules';
 import { isDue, intervalToString } from '../../utils/srs';
 
@@ -52,11 +52,10 @@ export default function CategoryDetailScreen() {
   const [showRomaji, setShowRomaji] = useState(state.showRomaji);
 
   const module = getModuleById(id || '');
-  const category = module?.categories[0] as Category | undefined;
-  const words = useMemo(
-    () => (category ? getWordsByCategory(category) : []),
-    [category]
-  );
+  const words = useMemo(() => {
+    if (!module) return [];
+    return allWords.filter(w => module.categories.includes(w.category));
+  }, [module]);
 
   const stats = useMemo(() => {
     const learned = words.filter(w => {
@@ -101,7 +100,7 @@ export default function CategoryDetailScreen() {
     );
   };
 
-  if (!module || !category) {
+  if (!module) {
     return (
       <View style={[styles.root, { paddingTop: insets.top, alignItems: 'center', justifyContent: 'center' }]}>
         <Text style={{ color: Colors.onSurfaceVariant, fontFamily: FontFamily.body }}>

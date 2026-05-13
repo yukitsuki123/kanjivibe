@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, Switch, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Switch, TouchableOpacity, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { 
@@ -63,7 +63,11 @@ function SettingsScreen() {
                   <Text style={styles.settingDesc}>Adjust text scale for readability</Text>
                 </View>
               </View>
-              <View style={styles.fontRow}>
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false} 
+                contentContainerStyle={styles.fontRow}
+              >
                 {fontSizeOptions.map((opt, idx) => (
                   <TouchableOpacity
                     key={opt.value}
@@ -82,7 +86,7 @@ function SettingsScreen() {
                     </Text>
                   </TouchableOpacity>
                 ))}
-              </View>
+              </ScrollView>
             </View>
           </GlassCard>
         </View>
@@ -123,7 +127,11 @@ function SettingsScreen() {
                   <Text style={styles.settingDesc}>Cards to review per day</Text>
                 </View>
               </View>
-              <View style={styles.goalRow}>
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false} 
+                contentContainerStyle={styles.goalRow}
+              >
                 {goalOptions.map(goal => (
                   <TouchableOpacity
                     key={goal}
@@ -141,7 +149,7 @@ function SettingsScreen() {
                     </Text>
                   </TouchableOpacity>
                 ))}
-              </View>
+              </ScrollView>
             </View>
           </GlassCard>
         </View>
@@ -171,7 +179,11 @@ function SettingsScreen() {
             <View style={styles.aboutContent}>
               <View style={styles.aboutHeader}>
                 <View style={styles.logoWrap}>
-                  <Text style={styles.logoText}>KV</Text>
+                  <Image 
+                    source={require('../../assets/images/logo.png')} 
+                    style={styles.logoImage}
+                    resizeMode="contain"
+                  />
                 </View>
                 <View>
                   <Text style={styles.aboutAppName}>KanjiVibe</Text>
@@ -222,13 +234,13 @@ const styles = StyleSheet.create({
   settingDesc: { fontFamily: FontFamily.body, fontSize: 12, color: Colors.onSurfaceVariant, marginTop: 2 },
   divider: { height: 1, backgroundColor: 'rgba(255,255,255,0.05)', marginVertical: 16 },
 
-  goalRow: { flexDirection: 'row', gap: 8, marginLeft: 54 },
+  goalRow: { gap: 8, paddingLeft: 54, paddingRight: 20 },
   goalChip: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: Radius.full, backgroundColor: Colors.surfaceContainerHighest, borderWidth: 1, borderColor: 'transparent' },
   goalChipActive: { backgroundColor: `${Colors.primary}20`, borderColor: `${Colors.primary}40` },
   goalChipText: { fontFamily: FontFamily.labelBold, fontSize: 13, color: Colors.onSurfaceVariant },
   goalChipTextActive: { color: Colors.primary },
 
-  fontRow: { flexDirection: 'row', gap: 12, marginLeft: 54 },
+  fontRow: { gap: 12, paddingLeft: 54, paddingRight: 20 },
   fontChip: { width: 44, height: 44, borderRadius: Radius.lg, backgroundColor: Colors.surfaceContainerHighest, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'transparent' },
   fontChipActive: { backgroundColor: `${Colors.tertiary}20`, borderColor: `${Colors.tertiary}40` },
   fontChipText: { fontFamily: FontFamily.headline, color: Colors.onSurfaceVariant },
@@ -236,8 +248,8 @@ const styles = StyleSheet.create({
 
   aboutContent: { padding: 4 },
   aboutHeader: { flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 16 },
-  logoWrap: { width: 48, height: 48, borderRadius: Radius.xl, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center' },
-  logoText: { fontFamily: FontFamily.headline, fontSize: 20, color: Colors.onPrimary },
+  logoWrap: { width: 48, height: 48, borderRadius: Radius.xl, backgroundColor: Colors.surfaceContainer, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  logoImage: { width: 42, height: 42 },
   aboutAppName: { fontFamily: FontFamily.headline, fontSize: 20, color: Colors.onSurface },
   aboutVersion: { fontFamily: FontFamily.labelBold, fontSize: 10, color: Colors.onSurfaceVariant, textTransform: 'uppercase' },
   aboutBio: { fontFamily: FontFamily.body, fontSize: 13, color: Colors.onSurfaceVariant, lineHeight: 20 },

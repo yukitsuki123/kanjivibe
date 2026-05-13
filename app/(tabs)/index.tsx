@@ -4,7 +4,7 @@
  */
 
 import React, { useMemo } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Dimensions, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Sparkles, Flame, Trophy, ArrowRight, BookOpen, Zap, CheckCircle, Target, BarChart2 } from 'lucide-react-native';
@@ -53,9 +53,18 @@ export default function DashboardScreen() {
       >
         {/* ── Top Bar ─────────────────────────────────────────────── */}
         <View style={styles.topBar}>
-          <View>
-            <Text style={styles.welcomeText}>Welcome back,</Text>
-            <Text style={styles.brand}>KANJIVIBE</Text>
+          <View style={styles.brandContainer}>
+            <View style={styles.logoWrap}>
+              <Image 
+                source={require('../../assets/images/logo.png')} 
+                style={styles.logo}
+                resizeMode="contain"
+              />
+            </View>
+            <View>
+              <Text style={styles.welcomeText}>Welcome back,</Text>
+              <Text style={styles.brand}>KANJIVIBE</Text>
+            </View>
           </View>
           <View style={styles.streakBadge}>
             <Flame size={16} color={Colors.primary} fill={Colors.primary} />
@@ -239,7 +248,10 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: Colors.surface },
   scrollContent: { paddingHorizontal: 20 },
 
-  topBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 16 },
+  topBar: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 28, paddingHorizontal: 4 },
+  brandContainer: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  logoWrap: { width: 44, height: 44, borderRadius: 12, backgroundColor: Colors.surfaceContainer, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  logo: { width: 38, height: 38 },
   welcomeText: { fontFamily: FontFamily.body, fontSize: 14, color: Colors.onSurfaceVariant },
   brand: { fontFamily: FontFamily.headline, fontSize: 22, color: Colors.primary, letterSpacing: -1 },
   streakBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: `${Colors.primary}15`, paddingHorizontal: 12, paddingVertical: 8, borderRadius: Radius.full, borderWidth: 1, borderColor: `${Colors.primary}20` },

@@ -1,0 +1,27 @@
+import { VocabEntry } from '../types';
+
+export const adjectives: VocabEntry[] = [
+  { id: 319, japanese: "大きい", hiragana: "おおきい", romaji: "ookii", english: "big, large", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice', exampleSentence: { japanese: "大きい家ですね。", english: "It's a big house, isn't it?" } },
+  { id: 320, japanese: "小さい", hiragana: "ちいさい", romaji: "chiisai", english: "small, little", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice', exampleSentence: { japanese: "小さい猫がいます。", english: "There is a small cat." } },
+  { id: 321, japanese: "新しい", hiragana: "あたらしい", romaji: "atarashii", english: "new", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice', exampleSentence: { japanese: "新しい靴を買いました。", english: "I bought new shoes." } },
+  { id: 322, japanese: "古い", hiragana: "ふるい", romaji: "furui", english: "old", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice', exampleSentence: { japanese: "古い本が好きです。", english: "I like old books." } },
+  { id: 323, japanese: "高い", hiragana: "たかい", romaji: "takai", english: "tall, expensive", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice', exampleSentence: { japanese: "この時計は高いです。", english: "This watch is expensive." } },
+  { id: 324, japanese: "安い", hiragana: "やすい", romaji: "yasui", english: "cheap, inexpensive", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice', exampleSentence: { japanese: "安いスーパーはどこですか。", english: "Where is a cheap supermarket?" } },
+  { id: 325, japanese: "いい", hiragana: "いい", romaji: "ii", english: "good", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice' },
+  { id: 326, japanese: "悪い", hiragana: "わるい", romaji: "warui", english: "bad", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice' },
+  { id: 327, japanese: "暑い", hiragana: "あつい", romaji: "atsui", english: "hot (weather)", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice' },
+  { id: 328, japanese: "寒い", hiragana: "さむい", romaji: "samui", english: "cold (weather)", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice' },
+  { id: 329, japanese: "楽しい", hiragana: "たのしい", romaji: "tanoshii", english: "fun, enjoyable", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice' },
+  { id: 330, japanese: "きれい", hiragana: "きれい", romaji: "kirei", english: "beautiful, clean", category: "adjectives", partOfSpeech: "na-adj", challengeType: 'multiple-choice' },
+  { id: 448, japanese: "長い", hiragana: "ながい", romaji: "nagai", english: "long", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice' },
+  { id: 449, japanese: "短い", hiragana: "みじかい", romaji: "mijikai", english: "short", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice' },
+  { id: 451, japanese: "低い", hiragana: "ひくい", romaji: "hikui", english: "low, short (height)", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice' },
+  { id: 458, japanese: "熱い", hiragana: "あつい", romaji: "atsui", english: "hot (objects/food)", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice' },
+  { id: 459, japanese: "冷たい", hiragana: "つめたい", romaji: "tsumetai", english: "cold (objects/food)", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice' },
+  { id: 460, japanese: "難しい", hiragana: "むずかしい", romaji: "muzukashii", english: "difficult", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice' },
+  { id: 461, japanese: "易しい", hiragana: "やさしい", romaji: "yasashii", english: "easy, gentle", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice' },
+  { id: 462, japanese: "おいしい", hiragana: "おいしい", romaji: "oishii", english: "delicious", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice' },
+  { id: 463, japanese: "まずい", hiragana: "まずい", romaji: "mazui", english: "bad-tasting", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice' },
+  { id: 464, japanese: "嬉しい", hiragana: "うれしい", romaji: "ureshii", english: "happy, glad", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice' },
+  { id: 465, japanese: "悲しい", hiragana: "かなしい", romaji: "kanashii", english: "sad", category: "adjectives", partOfSpeech: "i-adj", challengeType: 'multiple-choice' },
+];

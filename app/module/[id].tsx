@@ -12,7 +12,7 @@ import { Colors, Radius, Glass } from '../../constants/theme';
 import { FontFamily } from '../../constants/typography';
 import { useApp } from '../../context/AppContext';
 import { getModuleById } from '../../data/modules';
-import { getWordsByCategory, JapaneseWord } from '../../data/curriculum';
+import { allWords, JapaneseWord } from '../../data/curriculum';
 
 function ModuleDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -23,7 +23,7 @@ function ModuleDetailScreen() {
 
   const words = useMemo(() => {
     if (!module) return [];
-    return module.categories.flatMap(cat => getWordsByCategory(cat));
+    return allWords.filter(w => module.categories.includes(w.category));
   }, [module]);
 
   const accentColor = module?.accentColor === 'secondary' ? Colors.secondary

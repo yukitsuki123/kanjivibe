@@ -76,22 +76,48 @@ export default function QuizSessionScreen() {
       let correct = '';
       let poolForDistractors: string[] = [];
 
-      if (mode === 'meaning') {
-        qText = word.kanji || word.hiragana;
-        correct = word.english;
-        poolForDistractors = sourceWords.map(w => w.english);
-      } else if (mode === 'reading') {
-        qText = word.kanji || word.english;
-        correct = word.romaji || word.hiragana;
-        poolForDistractors = sourceWords.map(w => w.romaji || w.hiragana);
-      } else if (mode === 'character') {
-        qText = word.english || word.romaji;
-        correct = word.kanji || word.hiragana;
-        poolForDistractors = sourceWords.map(w => w.kanji || w.hiragana);
+      if (type === 'hiragana') {
+        // Hiragana:
+        if (mode === 'meaning') {
+          qText = word.hiragana;
+          correct = word.english;
+          poolForDistractors = sourceWords.map(w => w.english);
+        } else if (mode === 'reading') {
+          qText = word.hiragana;
+          correct = word.romaji;
+          poolForDistractors = sourceWords.map(w => w.romaji);
+        } else if (mode === 'character') {
+          qText = word.romaji;
+          correct = word.hiragana;
+          poolForDistractors = sourceWords.map(w => w.hiragana);
+        } else if (mode === 'english_to_hiragana') {
+          qText = word.english;
+          correct = word.hiragana;
+          poolForDistractors = sourceWords.map(w => w.hiragana);
+        }
       } else {
-        qText = word.kanji;
-        correct = word.english;
-        poolForDistractors = sourceWords.map(w => w.english);
+        // Kanji:
+        if (mode === 'meaning') {
+          qText = word.kanji;
+          correct = word.english;
+          poolForDistractors = sourceWords.map(w => w.english);
+        } else if (mode === 'reading') {
+          qText = word.kanji;
+          correct = word.onyomi || word.romaji;
+          poolForDistractors = sourceWords.map(w => w.onyomi || w.romaji);
+        } else if (mode === 'character') {
+          qText = word.english;
+          correct = word.kanji;
+          poolForDistractors = sourceWords.map(w => w.kanji);
+        } else if (mode === 'onyomi_to_kanji') {
+          qText = word.onyomi || word.romaji;
+          correct = word.kanji;
+          poolForDistractors = sourceWords.map(w => w.kanji);
+        } else {
+          qText = word.kanji;
+          correct = word.english;
+          poolForDistractors = sourceWords.map(w => w.english);
+        }
       }
 
       // Ensure distractors are unique and valid
@@ -161,7 +187,7 @@ export default function QuizSessionScreen() {
       shake();
     }
 
-    // Fast transition as requested
+    // Delayed transition
     setTimeout(() => {
       if (current + 1 >= questions.length) {
         if (category) {
@@ -173,7 +199,7 @@ export default function QuizSessionScreen() {
         setSelected(null);
         setAnswered(false);
       }
-    }, 1700); // Balanced transition to allow seeing feedback
+    }, 1750); // User requested longer delay
   }
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
@@ -220,6 +246,56 @@ export default function QuizSessionScreen() {
   }
 
   const q = questions[current];
+  const word = allWords.find(w => w.id === q.wordId);
+
+  if (word?.challengeType === 'sentence-builder') {
+    return (
+      <View style={[styles.root, { backgroundColor: Colors.surface }]}>
+        <View style={[styles.container, { paddingTop: topPad + 8 }]}>
+          {/* Progress Header */}
+          <View style={styles.progressHeader}>
+            <Pressable onPress={() => router.back()} style={{ padding: 8 }}>
+              <Text style={styles.exitText}>✕</Text>
+            </Pressable>
+            <View style={styles.progressBarBg}>
+              <Animated.View
+                style={[
+                  styles.progressBarFill,
+                  {
+                    width: progressAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ["0%", "100%"],
+                    }),
+                  },
+                ]}
+              />
+            </View>
+            <Text style={styles.countText}>{current + 1}/{questions.length}</Text>
+          </View>
+
+          {/* Sentence Builder Placeholder */}
+          <View style={styles.sentenceBuilderContainer}>
+            <Text style={styles.builderTitle}>Build this sentence:</Text>
+            <View style={styles.templateCard}>
+              <Text style={styles.templateText}>{word.english}</Text>
+            </View>
+
+            <View style={styles.slotGrid}>
+              <Text style={styles.placeholderText}>Sentence builder UI coming soon...</Text>
+              <Text style={styles.templateResult}>{word.kanji}</Text>
+            </View>
+
+            <Pressable
+              style={styles.checkBtn}
+              onPress={() => handleAnswer(q.correctAnswer)}
+            >
+              <Text style={styles.checkBtnText}>Check Answer</Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.root, { backgroundColor: Colors.surface }]}>
@@ -261,9 +337,20 @@ export default function QuizSessionScreen() {
           ]}
         >
           <Text style={styles.questionPrompt}>
-            {mode === "meaning" ? "What does this mean?" : mode === "reading" ? "How do you read this?" : "Which character?"}
+            {mode === "meaning" ? "What does this mean?" :
+              mode === "reading" ? "How do you read this?" :
+                mode === "character" ? (type === 'kanji' ? "Which kanji?" : "Which hiragana?") :
+                  mode === "onyomi_to_kanji" ? "Which kanji has this onyomi?" :
+                    mode === "english_to_hiragana" ? "Which hiragana matches this English?" :
+                      "Identify the character"}
           </Text>
-          <Text style={styles.questionText} adjustsFontSizeToFit numberOfLines={2}>{q.question}</Text>
+          <Text
+            style={[styles.questionText, mode === 'context' && { fontSize: 22, lineHeight: 32 }]}
+            adjustsFontSizeToFit
+            numberOfLines={mode === 'context' ? 4 : 2}
+          >
+            {q.question}
+          </Text>
         </Animated.View>
 
         {/* Options */}
@@ -345,6 +432,17 @@ const styles = StyleSheet.create({
   optionsGrid: { gap: 12 },
   optionBtn: { padding: 18, borderRadius: Radius.xl, borderWidth: 1.5, alignItems: "center" },
   optionText: { fontSize: 16, fontFamily: FontFamily.labelBold, textAlign: "center" },
+ 
+  // Sentence Builder
+  sentenceBuilderContainer: { flex: 1, paddingTop: 20 },
+  builderTitle: { fontSize: 18, fontFamily: FontFamily.headline, color: Colors.onSurface, marginBottom: 16 },
+  templateCard: { padding: 24, borderRadius: Radius.xl, backgroundColor: Colors.surfaceContainer, borderWidth: 1, borderColor: Glass.border, marginBottom: 24 },
+  templateText: { fontSize: 20, fontFamily: FontFamily.body, color: Colors.onSurface, textAlign: 'center' },
+  slotGrid: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 20 },
+  placeholderText: { fontSize: 14, fontFamily: FontFamily.body, color: Colors.onSurfaceVariant, fontStyle: 'italic' },
+  templateResult: { fontSize: 28, fontFamily: FontFamily.headline, color: Colors.primary, textAlign: 'center' },
+  checkBtn: { paddingVertical: 18, borderRadius: Radius.xl, backgroundColor: Colors.primary, alignItems: 'center' },
+  checkBtnText: { fontSize: 16, fontFamily: FontFamily.headline, color: '#fff' },
 
   resultsContainer: { flex: 1, alignItems: "center", paddingHorizontal: 32, justifyContent: "center" },
   resultTitle: { fontSize: 24, fontFamily: FontFamily.headline, color: Colors.onSurface, marginBottom: 8 },

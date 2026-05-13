@@ -2,10 +2,10 @@
  * KanjiVibe — Complete Curriculum Data Engine
  */
 
-import { kanji } from './db_kanji';
-import { hiragana } from './db_hiragana';
-import { katakana } from './db_katakana';
-import { vocabulary } from './db_vocabulary';
+import { kanji as masterKanji, hiragana as masterHiragana, katakana as masterKatakana } from './kanjany-database';
+import * as Categories from './categories';
+import { sentenceTemplates } from './sentences';
+import { VocabEntry, KanjiEntry, SentenceEntry } from './types';
 
 // ─── SRS Card Type ────────────────────────────────────────────────────
 
@@ -65,6 +65,29 @@ export type Category =
   | 'times'
   | 'verbs'
   | 'weekdays'
+  | 'vocab_adjectives'
+  | 'vocab_anatomy'
+  | 'vocab_animals'
+  | 'vocab_colors'
+  | 'vocab_daily'
+  | 'vocab_family'
+  | 'vocab_food'
+  | 'vocab_grammar'
+  | 'vocab_greetings'
+  | 'vocab_kosado'
+  | 'vocab_math'
+  | 'vocab_months'
+  | 'vocab_nature'
+  | 'vocab_numbers'
+  | 'vocab_particles'
+  | 'vocab_phrases'
+  | 'vocab_possessives'
+  | 'vocab_time'
+  | 'vocab_times'
+  | 'vocab_verbs'
+  | 'vocab_weather'
+  | 'vocab_weekdays'
+  | 'sentences'
   | string;
 
 export interface JapaneseWord {
@@ -76,6 +99,7 @@ export interface JapaneseWord {
   english: string;
   category: Category;
   jlptLevel: JLPTLevel;
+  challengeType: 'multiple-choice' | 'sentence-builder' | 'flashcard';
   strokes?: number;
   frequency?: number;
   onyomi?: string;
@@ -89,8 +113,11 @@ export interface JapaneseWord {
 
 // ─── Master Curriculum ───────────────────────────────────────────────
 
+// Aggregate all vocabulary from category files
+const allVocab: VocabEntry[] = Object.values(Categories).flat() as VocabEntry[];
+
 export const allWords: JapaneseWord[] = [
-  ...kanji.map((k) => ({
+  ...masterKanji.map((k) => ({
     id: `kanji-${k.id}`,
     kanji: k.character,
     hiragana: k.kunyomi[0] || k.onyomi[0] || '',
@@ -101,13 +128,14 @@ export const allWords: JapaneseWord[] = [
     onyomi: k.onyomi.join(', '),
     kunyomi: k.kunyomi.join(', '),
     strokes: k.strokeCount,
+    challengeType: 'multiple-choice' as 'multiple-choice' | 'sentence-builder' | 'flashcard',
     exampleSentence: k.exampleWords[0] ? {
       japanese: k.exampleWords[0].word,
       romaji: k.exampleWords[0].reading,
       english: k.exampleWords[0].meaning,
     } : undefined,
   })),
-  ...hiragana.map((h) => ({
+  ...masterHiragana.map((h) => ({
     id: `hiragana-${h.id}`,
     kanji: h.character,
     hiragana: h.character,
@@ -115,8 +143,9 @@ export const allWords: JapaneseWord[] = [
     english: h.romaji,
     category: 'hiragana' as Category,
     jlptLevel: 'N5' as JLPTLevel,
+    challengeType: 'multiple-choice' as 'multiple-choice' | 'sentence-builder' | 'flashcard',
   })),
-  ...katakana.map((k) => ({
+  ...masterKatakana.map((k) => ({
     id: `katakana-${k.id}`,
     kanji: k.character,
     hiragana: k.character,
@@ -124,8 +153,9 @@ export const allWords: JapaneseWord[] = [
     english: k.romaji,
     category: 'katakana' as Category,
     jlptLevel: 'N5' as JLPTLevel,
+    challengeType: 'multiple-choice' as 'multiple-choice' | 'sentence-builder' | 'flashcard',
   })),
-  ...vocabulary.map((v) => ({
+  ...allVocab.map((v) => ({
     id: `vocab-${v.id}`,
     kanji: v.japanese,
     hiragana: v.hiragana,
@@ -133,6 +163,19 @@ export const allWords: JapaneseWord[] = [
     english: v.english,
     category: `vocab_${v.category}` as Category,
     jlptLevel: 'N5' as JLPTLevel,
+    challengeType: v.challengeType as 'multiple-choice' | 'sentence-builder' | 'flashcard',
+    exampleSentence: v.exampleSentence,
+  })),
+  // Add Sentence Templates as their own category
+  ...sentenceTemplates.map((st) => ({
+    id: `sentence-${st.id}`,
+    kanji: st.pattern,
+    hiragana: st.pattern,
+    romaji: '',
+    english: st.id,
+    category: 'sentences' as Category,
+    jlptLevel: 'N5' as JLPTLevel,
+    challengeType: 'sentence-builder' as 'multiple-choice' | 'sentence-builder' | 'flashcard',
   })),
 ];
 
